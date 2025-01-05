@@ -1,0 +1,50 @@
+    def __init__(self):
+        self.word_scores = defaultdict(float)
+        self.spam_prior = 0.5
+        self.min_word_length = 2
+        
+        # Vyrazne zvysene vahy pre spam slova
+        self.spam_words = {
+            'win': 4.0, 'cash': 4.5, 'prize': 4.0, 'lottery': 4.5,
+            'urgent': 3.5, 'free': 3.0, 'offer': 3.0, 'click': 4.0,
+            'buy': 3.0, 'investment': 3.5, 'viagra': 5.0, 'money': 4.0,
+            'guarantee': 3.5, 'credit': 3.5, 'loan': 4.0, 'debt': 3.5,
+            'casino': 4.5, 'bonus': 3.5, 'discount': 3.0, 'limited': 3.0,
+            'subscribe': 3.0, 'promotion': 3.5, 'winner': 4.0, 'pills': 4.0,
+            'dollars': 3.5, 'prices': 3.0, 'income': 3.5, 'earn': 3.8,
+            'spam': 5.0, 'advertisement': 3.5, 'marketing': 3.0,
+            'pharmacy': 4.5, 'medication': 4.0, 'cure': 3.5, 'weight': 3.0,
+            'success': 3.0, 'millions': 4.0, 'guaranteed': 3.5, 'unlimited': 3.5,
+            'risk-free': 4.0, 'investment': 3.5, 'opportunity': 3.0
+        }
+        
+        self.stop_words = {
+            'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'i', 
+            'it', 'for', 'not', 'on', 'with', 'he', 'as', 'you', 'do', 'at',
+            'this', 'but', 'his', 'by', 'from', 'they', 'we', 'say', 'her'
+        }
+        
+        # Pridane bigramy pre lepsiu detekciu
+        self.spam_bigrams = {
+            'click here': 4.0, 'buy now': 4.0, 'limited time': 3.5,
+            'special offer': 3.5, 'act now': 3.5, 'money back': 3.5,
+            'credit card': 3.0, 'free trial': 3.5
+        }
+
+    def _clean_text(self, text: str) -> str:
+        text = text.lower()
+        # Zachovanie dolára a ďalších menových symbolov
+        text = text.replace('$', ' dollar ')
+        text = text.replace('€', ' euro ')
+        text = text.replace('£', ' pound ')
+        # Odstránenie URL
+        text = re.sub(r'http[s]?://\S+', ' URL ', text)
+        # Odstránenie HTML
+        text = re.sub(r'<[^>]+>', ' HTML ', text)
+        # Nahradenie čísel
+        text = re.sub(r'\d+(?:\.\d+)?%', ' PERCENTAGE ', text)
+        text = re.sub(r'\d+(?:\.\d+)?', ' NUMBER ', text)
+        # Odstránenie špeciálnych znakov ale zachovanie exclamation marks
+        text = re.sub(r'!+', ' EXCLAMATION ', text)
+        text = re.sub(r'[^\w\s]', ' ', text)
+        return ' '.join(text.split())
