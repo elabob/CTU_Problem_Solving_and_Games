@@ -1,0 +1,4 @@
+*.tgz
+*.zip
+.idea/
+result/
